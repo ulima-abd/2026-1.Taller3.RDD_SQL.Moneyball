@@ -99,11 +99,40 @@ Calcule el conteo total de jugadores y la técnica promedio (Tec) de cada grupo.
 
 ---
 
+### Pregunta 7 · RDD — Diversidad Táctica del Mercado Gratuito (Distribución por Posición)
+
+Antes de diseñar cualquier estrategia de fichajes, la dirección técnica necesita saber qué tipos de jugadores pueblan el mercado ineficiente. Conocer la distribución posicional permite identificar si hay superávit en alguna zona del campo que pueda aprovecharse tácticamente.
+
+Construya un flujo RDD que, a partir del universo de jugadores con Transfer Value **"0$"** y club válido (no vacío ni "-"), calcule cuántos jugadores existen por cada valor único de **Position**. Muestre los resultados ordenados de **mayor a menor cantidad**, limitando la salida a las **8 posiciones más frecuentes**.
+
+> **Reflexión previa:** ¿Esperarías que los porteros (GK) sean los más abundantes en el mercado gratuito, o lo serían los defensas? ¿Por qué los clubs podrían retener a jugadores de ciertas posiciones con valor 0$ en lugar de liberarlos?
+
+---
+
+### Pregunta 8 · RDD — Detección de "Joyas Ocultas" Multidimensional (Filtrado Compuesto Estricto)
+
+El peor error en Moneyball es fichar a un jugador que destaca en una sola métrica pero falla en las demás. La directiva exige candidatos que sean sólidos en los **tres atributos clave al mismo tiempo**, no especialistas de una sola dimensión.
+
+Filtre el dataset para encontrar jugadores que cumplan **todas** las siguientes condiciones simultáneamente:
+
+- Transfer Value **"0$"**
+- Club válido (no vacío ni "-")
+- Visión (Vis) **≥ 14**
+- Técnica (Tec) **≥ 14**
+- Liderazgo (Ldr) **≥ 14**
+- Edad **menor a 28 años**
+
+Muestre el **conteo total** de jugadores que cumplen este perfil y liste los **primeros 10** ordenados por edad de forma **ascendente** (más jóvenes primero). La salida debe incluir: Nombre, Club, Posición, Edad, Vis, Tec y Ldr.
+
+> **Reflexión previa:** ¿Esperas que este filtro sea muy restrictivo o que existan muchos jugadores con estas condiciones? ¿Qué dice sobre el mercado si el resultado es muy pequeño?
+
+---
+
 ## BLOQUE B — Análisis Avanzado con Spark SQL
 
 ---
 
-### Pregunta 7 · RDD — Radar de Talento Integral – Score Compuesto de Potencial Moneyball
+### Pregunta 9 · RDD — Radar de Talento Integral – Score Compuesto de Potencial Moneyball
 
 El director técnico exige un solo número que resuma la "ganga" de cada jugador. El analista jefe ha propuesto un Score Compuesto que pondera las tres métricas clave de forma diferente según su importancia táctica:
 
@@ -119,7 +148,7 @@ Usando RDD, filtre únicamente los jugadores con Transfer Value "0$" y calcule e
 
 ---
 
-### Pregunta 8 · SQL — Análisis de Brecha por Posición – ¿Dónde hay más talento oculto?
+### Pregunta 10 · SQL — Análisis de Brecha por Posición – ¿Dónde hay más talento oculto?
 
 El scout jefe sospecha que ciertas posiciones concentran una cantidad desproporcionada de talento gratuito. Para confirmar su hipótesis necesita una tabla comparativa.
 
@@ -151,7 +180,7 @@ Usando Spark SQL, calcula para cada Posición (Position) de los jugadores con Tr
 
 ---
 
-### Pregunta 9 · SQL — Detección de Monopolios de Talento – Clubes con Reservas Ocultas
+### Pregunta 11 · SQL — Detección de Monopolios de Talento – Clubes con Reservas Ocultas
 
 La directiva sospecha que algunos clubes acumulan a propósito jugadores con valor 0$ para luego venderlos renovados. Queremos identificar esos "monopolizadores de talento" antes de que lo hagan.
 
@@ -167,11 +196,48 @@ Para cada club detectado, muestra: nombre del Club, total de jugadores gratuitos
 
 ---
 
+### Pregunta 12 · SQL — Segmentación Etaria del Talento por Posición (Análisis de Cohortes)
+
+El departamento financiero quiere minimizar el riesgo de depreciación: un jugador joven con alto potencial puede revalorizarse y venderse con beneficio, mientras que un veterano con valor 0$ representa solo un costo operativo. Para diseñar la política de fichajes, necesitan cruzar la posición con la franja etaria.
+
+Usando Spark SQL sobre el DataFrame de jugadores con Transfer Value **"0$"**, crea una tabla que muestre para cada combinación de **Position** y grupo de edad:
+
+- **"Sub-21"** → Age < 21  
+- **"21-25"** → Age entre 21 y 25 inclusive  
+- **"26-30"** → Age entre 26 y 30 inclusive  
+- **"Veterano"** → Age > 30  
+
+Calcula para cada celda de la tabla: cantidad de jugadores (`COUNT`), Técnica promedio (`AVG Tec`) y Visión promedio (`AVG Vis`). Filtra solo las combinaciones con **al menos 5 jugadores**. Ordena por Position y luego por grupo de edad.
+
+> **Desafío adicional — Responde antes de codificar:**
+> 1. ¿En qué franja etaria esperarías encontrar la mayor Técnica promedio y por qué?
+> 2. ¿Tiene sentido que un "Veterano" con valor 0$ tenga alta Visión? ¿Qué implicancia táctica tendría ficharlo?
+> 3. ¿Cómo usarías esta tabla para construir una plantilla balanceada en experiencia y potencial?
+
+---
+
+### Pregunta 13 · SQL — Ranking de Clubes Exportadores de Talento Subvalorado
+
+La hipótesis del analista jefe es que ciertos clubes funcionan involuntariamente como "academias públicas": forman jugadores con atributos elevados pero los mantienen con valor 0$, posiblemente por razones administrativas o contractuales. Identificar esos clubes nos permite anticiparnos al mercado.
+
+Usando Spark SQL, construye un ranking de clubes según su **"Índice de Talento Subvalorado"**, definido como:
+
+$$\text{Índice} = \text{AVG}(\text{Vis}) + \text{AVG}(\text{Tec}) + \text{AVG}(\text{Ldr})$$
+
+Aplica los siguientes filtros y condiciones:
+
+- Solo jugadores con Transfer Value **"0$"** y club válido
+- Solo clubes con **al menos 8 jugadores** en esa condición
+- Muestra: nombre del Club, cantidad de jugadores, AVG Vis, AVG Tec, AVG Ldr e Índice (redondeado a 2 decimales)
+- Ordena por Índice de forma **descendente** y muestra el **Top 10**
+
+----
+
 ## BLOQUE C — Integración y Estrategia
 
 ---
 
-### Pregunta 10 · RDD — Índice de Desempeño Relativo por Nacionalidad – ¿Quién está por encima de la media?
+### Pregunta 14 · RDD — Índice de Desempeño Relativo por Nacionalidad – ¿Quién está por encima de la media?
 
 No basta saber que un jugador tiene buena técnica en términos absolutos; lo que importa es si supera la media de su propia nacionalidad. Un jugador con Tec = 16 en un grupo cuya media es 13 es más valioso que uno con Tec = 16 en un grupo cuya media es 17.
 
@@ -179,7 +245,7 @@ Filtra y muestra solo los jugadores que están en el **Top 3 de su propia nació
 
 ---
 
-### Pregunta 11 · RDD + SQL — Estrategia de Fichar por Perfil Mixto – Pipeline Completo de Decisión
+### Pregunta 15 · RDD + SQL — Estrategia de Fichar por Perfil Mixto – Pipeline Completo de Decisión
 
 La directiva necesita presentar al consejo una lista ejecutiva final de fichajes recomendados. No se trata solo de un número o de una tabla: requiere un pipeline reproducible que combine el Score Compuesto (Pregunta 7) con el contexto de mercado (Preguntas 8 y 9) para producir una lista priorizada y justificada.
 
@@ -206,3 +272,48 @@ La directiva necesita presentar al consejo una lista ejecutiva final de fichajes
 > **C)** Si tuvieras que ajustar los pesos del Score Compuesto para favorecer más el Liderazgo (equipo joven e indisciplinado), ¿cómo cambiaría la fórmula y qué efecto esperarías en la lista?
 >
 > **D)** ¿Qué limitación metodológica tiene este pipeline al no considerar el campo de juego (local/visitante) o la posición exacta dentro del esquema táctico?
+
+---
+
+### Pregunta 16 · RDD — Análisis de Consistencia por Perfil (Coeficiente de Variación de Atributos)
+
+Un jugador "promedio alto" en un grupo puede estar ocultando una distribución muy desigual: algunos con atributos altísimos y otros muy bajos. Para el scouting es más útil conocer la **consistencia** del grupo que su media. El Coeficiente de Variación (CV) mide exactamente eso: qué tan dispersos están los valores respecto a la media.
+
+Usando RDD, para cada **Posición** presente entre los jugadores con Transfer Value **"0$"**:
+
+1. Calcula la **media** y la **desviación estándar** del atributo Técnica (Tec).
+2. Calcula el **Coeficiente de Variación**: CV = (Desviación Estándar / Media) × 100
+3. Filtra posiciones con **al menos 15 jugadores**.
+4. Muestra los resultados ordenados por CV de forma **ascendente** (menor dispersión primero), con: Posición, cantidad de jugadores, Media Tec, Desviación Estándar Tec y CV (redondeado a 2 decimales).
+
+> **Reflexión estratégica:** Una posición con CV bajo significa que sus jugadores gratuitos son homogéneamente técnicos (o igualmente mediocres). Una con CV alto tiene jugadores muy dispares. ¿Cuál escenario es más favorable para el scouting y por qué? ¿Cómo usarías este análisis para decidir en qué posición vale más la pena invertir tiempo de búsqueda?
+
+---
+
+### Pregunta 17 · RDD + SQL — Pipeline de Fiabilidad — Detección de Candidatos con Perfil Sostenible a Largo Plazo
+
+El consejo directivo no quiere fichajes de impacto inmediato que se deprecien en dos temporadas. Necesitan jugadores cuyo perfil sea sostenible: jóvenes, técnicamente sólidos, con liderazgo suficiente para crecer dentro del vestuario y que no pertenezcan a clubes que ya acumulen demasiado talento gratuito (lo que sugeriría que el jugador tiene problemas de rendimiento no visibles en las métricas).
+
+**Instrucciones del pipeline:**
+
+1. **Con RDD**, filtra jugadores con Transfer Value **"0$"** que cumplan:
+   - Edad entre **17 y 24 años** inclusive
+   - Tec ≥ **13**, Vis ≥ **12**, Ldr ≥ **11**
+   - Club válido (no vacío ni "-")
+2. **Calcula el Score de Sostenibilidad** con la siguiente fórmula:
+
+$$\text{Score\_Sost} = (\text{Tec} \times 0.45) + (\text{Vis} \times 0.35) + (\text{Ldr} \times 0.20)$$
+
+3. **Convierte el RDD resultante en un DataFrame** y regístralo como vista temporal `candidatos_sostenibles`.
+4. **Con Spark SQL**, aplica un segundo filtro: excluye jugadores que pertenezcan a clubes con **más de 20 jugadores** en el mercado gratuito total (usa una subconsulta o CTE sobre el DataFrame completo para calcular ese conteo por club).
+5. **Ordena** por Score de Sostenibilidad de mayor a menor y muestra los **primeros 12 candidatos** con: Nombre, Club, Posición, Edad y Score\_Sost (redondeado a 2 decimales).
+
+> **Sección de Reflexión Estratégica — Obligatoria**
+>
+> **A)** ¿Por qué tiene sentido penalizar a jugadores de clubes con demasiados activos gratuitos? ¿Qué señal de mercado podría estar detrás de ese patrón?
+>
+> **B)** Compara los pesos del Score de Sostenibilidad con los del Score Compuesto de la Pregunta 7. ¿Qué filosofía de juego refleja cada fórmula?
+>
+> **C)** ¿Qué tipo de dato adicional del dataset (que no estés usando actualmente) podría enriquecer este pipeline para reducir el riesgo de fichajes fallidos?
+>
+> **D)** Si el pipeline devuelve menos de 5 candidatos, ¿qué parámetros ajustarías primero y en qué orden? Justifica tu criterio.
