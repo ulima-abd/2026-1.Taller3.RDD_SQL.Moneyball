@@ -302,7 +302,7 @@ El consejo directivo no quiere fichajes de impacto inmediato que se deprecien en
    - Club válido (no vacío ni "-")
 2. **Calcula el Score de Sostenibilidad** con la siguiente fórmula:
 
-$$\text{Score_Sost} = (\text{Tec} \times 0.45) + (\text{Vis} \times 0.35) + (\text{Ldr} \times 0.20)$$
+$$\text{Score Sost} = (\text{Tec} \times 0.45) + (\text{Vis} \times 0.35) + (\text{Ldr} \times 0.20)$$
 
 3. **Convierte el RDD resultante en un DataFrame** y regístralo como vista temporal `candidatos_sostenibles`.
 4. **Con Spark SQL**, aplica un segundo filtro: excluye jugadores que pertenezcan a clubes con **más de 20 jugadores** en el mercado gratuito total (usa una subconsulta o CTE sobre el DataFrame completo para calcular ese conteo por club).
